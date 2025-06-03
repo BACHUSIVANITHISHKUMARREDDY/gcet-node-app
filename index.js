@@ -4,7 +4,7 @@ app.listen(8080,() =>{
     console.log("Server Started");
 });
 app.get("/",(req,res) =>{
-    return res.send("Hello Nithish");
+    return res.send("Hello World");
 });
 app.get("/greet",(req,res) =>{
     res.send("Greetings");
