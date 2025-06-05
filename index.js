@@ -1,38 +1,34 @@
-import express from 'express';
+import express from "express";
 import mongoose from "mongoose";
 import cors from "cors";
-const app= express()
-app.listen(8080,() =>{
-    mongoose.connect("mongodb://localhost:27017/gcet");
-    console.log("Server Started");
-});
-const userSchema = mongoose.Schema({
-    name: { type: String },
-});
-const user = mongoose.model("user", userSchema);
+import dotenv from 'dotenv';
+import userRouter from "./routes/userRoutes.js";
+import productRouter from "./routes/productRoutes.js";
+import orderRouter from "./routes/orderRoutes.js";
 
-app.get("/register", async (req,res) =>{
-    const result =await user.insertone({ name:"john"});
-    return res.json(result);
-});
+dotenv.config();
 
-app.get("/",(req,res) =>{
-    return res.send("Hello World");
-});
-app.get("/greet",(req,res) =>{
-    res.send("Greetings");
-});
-app.get("/name",(req,res) =>{
-    return res.send("Nithish");
-});
-app.get("/weather",(req,res) =>{
-    return res.send("36 degrees");
-});
-app.get("/products",(req,res) =>{
-    const products =[
-        {name:"product 1",price:20},
-        {name:"product 2",price:30},
-        {name:"product 3",price:50}  
-    ];
-    res.json(products);
-});
+const app = express();
+app.use(cors());
+app.use(express.json());
+
+const DBUSER = encodeURIComponent(process.env.DBUSER)
+const DBPASS = encodeURIComponent(process.env.DBPASS)
+const MONGO_URI =`mongodb+srv://${DBUSER}:${DBPASS}@cluster0.bmaqmbm.mongodb.net/gcet?retryWrites=true&w=majority&appName=Cluster0`
+
+// const MONGO_URI = process.env.MONGO_URI
+//testing
+app.use("/users", userRouter);
+app.use("/products", productRouter);
+app.use("/orders",orderRouter)
+
+mongoose
+  .connect(MONGO_URI)
+  .then(() => {
+    app.listen(8080, () => {
+      console.log("Server Started on port 8080");
+    });
+  })
+  .catch((error) => {
+    console.log(error);
+  });
